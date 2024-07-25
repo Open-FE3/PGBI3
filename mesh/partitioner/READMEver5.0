@@ -1,0 +1,160 @@
+#-----------------------------------------------------------------------
+#   Copyright 1999, 2000, 2001, 2002, 2003 by the Research Organization
+#   for Information Science & Technology (RIST)
+#-----------------------------------------------------------------------
+
+         OVERVIEW : GeoFEM Partitioner Ver.5.0
+                    June, 2002.
+
+ 1. Some known bugs have been fixed.
+ 2. 'Greedy Method' is no longer available.
+ 3. Some optimization for performance has been implemented.
+ 4. Option for RCM re-ordering with Gibbs' rooting.
+
+################################################################
+
+         OVERVIEW : GeoFEM Partitioner Ver.4.1
+                    August, 2001.
+
+ 1. Some known bugs have been fixed.
+ 2. Binary file format has been adopted 
+    for work files. File names are 'work.*'.
+
+    These files should be deleted by the users.
+
+################################################################
+
+          OVERVIEW : GeoFEM Partitioner Ver.4.0
+                     January, 2001.
+!
+!***
+!*** NEW Features
+!***
+
+(1) Option for output of UCD-format file with overlapping
+    for AVS.
+(2) Users can specify the name of the output file(s)
+    ("in.*" in Ver.3.0)
+(3) Arbitrary number of domains (upto 128 in Ver.3.0)
+(4) Option for multicolor re-ordering
+
+!
+!***
+!*** HOW to RUN
+!***
+
+GeoFEM command SYNOPSIS is commonly defined among analyzer, i.e.,
+command syntax of for partitioner program is as follows:
+
+	% mpirun -np 1 partGeoFEM [-in IName]
+
+Where:
+
+-in IName: Indicates the "input filenames". 
+The default IName is "GeoFEM/in"
+User has to prepare the file "IName.0" as initial 1-region grid file.
+
+Partitioner program is actually a serial code but users has to install 
+MPI, link the source files with MPI library and run the code using 
+MPI library.
+
+Output files are named "[OUTPUT].0"-"in.NPE" where NPE is the
+number of partitions which user specified in the partitioning process
+and [OUTPUT] is the header for output files specified by user.
+
+If you start the partitioner code, you can
+easily input parameters accordiong to interactive directions by the code.
+If ">>>" appears on the screen, the code waits for parameter input.
+
+!
+!***
+!*** METHODS
+!***
+
+GeoFEM provides following 3 methods for partitioning :
+
+  a. RCB (Recursive Coordinate Bisection)
+  b. Greedy
+  c. METIS
+
+"RCB" is simple but fast and robust.
+It is suitable for simple geometries but provides
+only 2^N domains.
+
+"Greedy" can generate arbitrary numbers of domains but
+is rather slow. It's not recommended.
+
+"METIS" is widely used public domain obtained from :
+
+http://www-users.cs.umn.edu/~karypis/metis/
+
+It's fast and robust.
+Arbitrary numbers of domains can be obtained.
+
+If you want to use "METIS", proceed as follows :
+
+  1. generate "METIS" input file by (4)-menu in 
+     GeoFEM partitioner
+
+  2. run "METIS"
+
+  3. generate partitioned GeoFEM grid files by
+    (3)-menu in GeoFEM partitioner. 
+     You have to type "METIS" output file name
+     generated in 2.
+
+!
+!***
+!*** EXAMPLES
+!***
+
+1.prepare the file "tri.mini.0" in your current directory
+
+2.type
+  mpirun -np 1 partGeoFEM -in ($current directory)/tri.mini
+
+3.just follow the interactive directions
+
+4.specify the number of partitions "NPE" in the process
+
+5.specify the header of output files "[OUTPUT]"
+
+6.You can find files named "[OUTPUT].0"-"in.NPE-1" 
+  in the current directory.
+
+
+!
+!***
+!*** ELEMENT type
+!***
+
+   ROD :             111  1-2
+                     112  1-3:2
+   2D  : triangle    211  1-2-3
+                     212  1-2-3:4-5-6
+   2D  : quad.       221  1-2-3-4
+                     222  1-2-3-4:5-6-7-8
+   3D  : tet.        311  1-2-3-4
+                     312  1-2-3-4:5-6-7:8-9-10
+   3D  : prism       321  1-2-3-4-5-6
+                     322  1-2-3-4-5-6:7-8-9:10-11-12:13-14-15
+   3D  : hexa.       331  1-2-3-4-5-6-7-8
+                     332  1-2-3-4-5-6-7-8:9-10-11-12:13-14-15-16:17-18-19-20
+
+   master-slave(tri) 411  1:2-3-4 
+                     412  1:2-3-4:5-6-7
+   master-slave(quad)421  1:2-3-4-5 
+                     422  1:2-3-4-6:6-7-8-9
+
+   joint (tri)       511 (1-2-3)*(4-5-6)
+                     512 (1-2-3:4-5-6)*(7-8-9:10-11-12)
+   joint (quad)      521 (1-2-3-4)*(5-6-7-8)
+                     522 (1-2-3-4:5-6-7-8)*(9-10-11-12:13-14-15-16)
+
+   beam              611  1-2
+                     612  1-2:3
+
+   shell: triangle   711  1-2-3
+                     712  1-2-3:4-5-6
+   shell: quad.      721  1-2-3-4
+                     722  1-2-3-4:5-6-7-8

@@ -1,0 +1,25 @@
+# modified on May 16, 2016
+# added mkline
+
+#FC=gfortran
+IFC=ifort
+OPT=-parallel
+all: coastline mkline
+
+## coastline.exe
+objs=bgele.o addcorner.o coastline.o
+coastline : $(objs)
+	$(IFC) $(objs) -o coastline.exe
+
+## mkline
+objs2= m_matrix.o m_outerinnerproduct.o m_fem_util.o m_fem_edge_util.o m_line_type.o m_mesh_type.o mkline.o
+mkline: $(objs2)
+	$(IFC) $(OPT) $(objs2) -o mkline.exe
+
+.SUFFIXES : .f90 .o
+.f90.o:
+	$(IFC) -c $< -o $@
+clean:
+	rm -f *.o
+	rm -f *.mod
+	rm -f *.exe

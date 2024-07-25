@@ -1,0 +1,10 @@
+mpirun -np 1 partGeoFEM -in /home/g3/nakajima/GeoFEM/v4.0/src/util/partitioner/lc
+rm work.*
+
+
+
+
+
+
+
+
